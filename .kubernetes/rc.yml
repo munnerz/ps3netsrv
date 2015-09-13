@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: ps3netsrv
+spec:
+  replicas: 1
+  # selector identifies the set of pods that this
+  # replication controller is responsible for managing
+  selector:
+    name: ps3netsrv
+  # template defines the 'cookie cutter' used for creating
+  # new pods when necessary
+  template:
+    metadata:
+      labels:
+        # Important: these labels need to match the selector above
+        # The api server enforces this constraint.
+        name: ps3netsrv
+    spec:
+      containers:
+        - name: ps3netsrv
+          image: munnerz/ps3netsrv:latest
+          ports:
+            - containerPort: 38008
+          volumeMounts:
+            - name: data
+              mountPath: "/data"
+      volumes:
+        - name: data
+          nfs:
+            server: 10.30.51.111
+            path: "/data/ps3"
