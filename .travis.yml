@@ -1,0 +1,25 @@
+# Use the new Container based KVM stack which allows "sudo" access
+dist: trusty
+
+language: cpp
+
+compiler:
+  - gcc
+
+sudo: required
+
+only:
+  - master
+
+services:
+    - docker
+
+script:
+  - make
+
+after_success:
+  - docker login -e "$DOCKER_EMAIL" -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - docker build -t munnerz/ps3netsrv:${TRAVIS_COMMIT:0:7} .
+  - docker tag -f munnerz/ps3netsrv:${TRAVIS_COMMIT:0:7} "munnerz/ps3netsrv:latest"
+  - docker push munnerz/ps3netsrv:latest
+  - docker push munnerz/ps3netsrv:${TRAVIS_COMMIT:0:7}
